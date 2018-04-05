@@ -4,23 +4,26 @@ $(function(){
   var margin = {
     top: 40,
     right: 20,
-    bottom: 30,
-    left: 40
+    bottom: 40,
+    left: 50
   };
 
   function colors(i){
     switch(i) {
-      case 'Normal':
+      case 'Asia':
         return "red";
         break;
-      case 'Chaotic':
+      case 'Europe':
         return "blue";
+        break;
+      case 'North America':
+        return "green";
         break;
     };
   };
 
-  var canvasWidth = 400;
-  var canvasHeight = 300;
+  var canvasWidth = 800;
+  var canvasHeight = 600;
   var width = canvasWidth - margin.left - margin.right;
   var height = canvasHeight - margin.top - margin.bottom;
   var svg = d3.select('svg')
@@ -28,20 +31,21 @@ $(function(){
     .attr('height', canvasHeight);
 
   //title
+  //http://www.d3noob.org/2013/01/adding-title-to-your-d3js-graph.html
   svg.append("text")
         .attr("x", (canvasWidth / 2))
         .attr("y", margin.top/2 )
         .attr("text-anchor", "middle")
         .style("font-size", "20px")
-        .text("D3-assignment");
+        .text("How did tourists enter Brazil?");
 
   //x-axis
   svg.append("text")
         .attr("x", (canvasWidth / 2))
-        .attr("y", canvasHeight)
+        .attr("y", canvasHeight - 5)
         .attr("text-anchor", "middle")
         .style("font-size", "12px")
-        .text("X");
+        .text("By Land");
 
   //y-axis
   svg.append("text")
@@ -51,42 +55,40 @@ $(function(){
       .attr("dy", "1em")
       .style("text-anchor", "middle")
       .style("font-size", "12px")
-      .text("Y")
+      .text("By Sea")
 
   //add legend
-// var svg2 = d3.select("#legend")
-//   .append("svg")
-//   .attr("width", 30)
-//   .attr("height", 20);
+  //http://www.competa.com/blog/d3-js-part-7-of-9-adding-a-legend-to-explain-the-data/
+  var legendRectSize = 10
+  var legendSpacing = 6
 
-// var legend = svg2.append("g")
-//                 .attr("class", "legend1")
-//                 .attr('transform', 'translate(-20,50)')
+  var color = d3.scaleOrdinal()
+    .domain(["Asia", "Europe", 'North America'])
+    .range(["red", "blue", "green"]);
 
+  var legend = d3.select('svg')
+    .append("g")
+    .selectAll("g")
+    .data(color.domain())
+    .enter()
+    .append('g')
+      .attr('class', 'legend')
+      .attr('transform', function(d, i) {
+        var x = width - 50;
+        var y = 50 + i*legendRectSize*2;
+        return 'translate(' + x + ',' + y + ')';
+    });
 
-// legend.selectAll('rect')
-//   .data(dataset)
-//   .enter()
-//   .append("rect")
-//   .attr("x", 30)
-//   .attr("y", function(d, i){ return (i-1) *  20;})
-//   .attr("width", 5)
-//   .attr("height", 5)
-//   .style("fill", function(d) { return colors[d];
-//   })
+  legend.append('circle')
+    .attr("r", 3)
+    .style('fill', color)
+    .style('stroke', color);
 
-// legend.selectAll('text')
-//   .data(dataset)
-//   .enter()
-//   .append("text")
-//   .attr("x", 40)
-//   .attr("width", 5)
-//   .attr("height", 5)
-//   .attr("y", function(d, i){ return (i-1) *  20 + 5;})
-//   .text(function(d) {
-//     var text = color_hash[dataset.indexOf(d)][0];
-//     return text;
-//   });
+  legend.append('text')
+    .attr('x', legendRectSize)
+    .attr('y', legendRectSize - legendSpacing)
+    .text(function(d) { return d; });
+
 
   // Add area for points
   var graphArea = svg.append('g')
@@ -122,11 +124,11 @@ $(function(){
     // initialize the scatterplot for 2012
     // convert string to integer, otherwise d3.max has issues
     data.forEach(function(d) {
-        d['xValue_2012'] = +d['xValue_2012'];
-        d['yValue_2012'] = +d['yValue_2012'];
+        d['Land_2012'] = +d['Land_2012'];
+        d['Sea_2012'] = +d['Sea_2012'];
         });
-    var xmax = 2 + +d3.max(data,function (d){return d['xValue_2012']})
-    var ymax = 2 + +d3.max(data,function (d){return d['yValue_2012']})
+    var xmax = d3.max(data,function (d){return d['Land_2012']})*1.1
+    var ymax = d3.max(data,function (d){return d['Sea_2012']})*1.1
     xScale = d3.scaleLinear()
       .domain([0, xmax])
       .range([0, width])
@@ -149,15 +151,19 @@ $(function(){
            .data(data)
            .enter()
            .append('circle')
-           .attr('cx', function(d) {return d['xValue_2012']*width/xmax})
-           .attr('cy', function(d) {return height-d['yValue_2012']*height/ymax})
+           .attr('cx', function(d) {console.log(d['Land_2012']); return d['Land_2012']*width/xmax})
+           .attr('cy', function(d) {return height-d['Sea_2012']*height/ymax})
            .attr("r", 6)
-           .attr("fill", function(d) {return colors(d['category'])})
+           .attr("fill", function(d) {return colors(d['Continent'])})
+           // add toottip
+           // http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
            .on("mouseover", function(d) {
               div.transition()
                  .duration(200)
                  .style("opacity", .9);
-              div.html(d['xValue_2012'] + "," + d['yValue_2012'])
+              div.html('Country:' + d['Country'] + "<br/>" +
+                       ' By land:' + d['Land_2012'] + "<br/>" +
+                       " By Sea:" + d['Sea_2012'])
                  .style("left", (d3.event.pageX) + "px")
                  .style("top", (d3.event.pageY - 28) + "px");
              })
@@ -175,9 +181,11 @@ $(function(){
     } else {
       year = year + 1;
     }
+    //return current year to index.html
     $("#year").text('Year: ' + String(year));
-    var xColumn = 'xValue_' + String(year);
-    var yColumn = 'yValue_' + String(year);
+
+    var xColumn = 'Land_' + String(year);
+    var yColumn = 'Sea_' + String(year);
     // Step 4: Animate changing the points shown by year here
 
 
@@ -186,10 +194,14 @@ $(function(){
         d[xColumn] = +d[xColumn];
         d[yColumn] = +d[yColumn];
         });
-      var xmax = 2 + +d3.max(data,function (d){return d[xColumn]})
-      var ymax = 2 + +d3.max(data,function (d){return d[yColumn]})
-      console.log(+d3.max(data,function(d){return d[xColumn]}))
-      console.log(ymax)
+
+      //autoscale axis
+      //https://bl.ocks.org/HarryStevens/678935d06d4601c25cb141bacd4068ce
+      var xmax = d3.max(data,function (d){return d[xColumn]})*1.1
+      var ymax = d3.max(data,function (d){return d[yColumn]})*1.1
+      //console.log(+d3.max(data,function(d){return d[xColumn]}))
+      //console.log(ymax)
+
       xScale.domain([0, xmax])
       yScale.domain([ymax, 0])
       var t = d3.transition()
@@ -210,7 +222,7 @@ $(function(){
                .attr('cx', function(d) {return d[xColumn]*width/xmax})
                .attr('cy', function(d) {return height-d[yColumn]*height/ymax})
                .attr("r", 6)
-               .attr("fill", function(d) {return colors(d['category'])});
+               .attr("fill", function(d) {return colors(d['Continent'])});
 
       graphArea.selectAll('circle')
                .data(data)
@@ -218,7 +230,9 @@ $(function(){
                   div.transition()
                     .duration(200)
                     .style("opacity", .9);
-                  div.html(d[xColumn] + "," + d[yColumn])
+                  div.html('Country:' + d['Country'] + "<br/>" +
+                      ' By land:' + d[xColumn] + "<br/>" +
+                       " By Sea:" + d[yColumn])
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
                   })

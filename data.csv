@@ -1,1 +1,12 @@
-row,xValue_2012,xValue_2013,xValue_2014,xValue_2015,yValue_2012,yValue_2013,yValue_2014,yValue_2015,category1,4,5,9,6,9,7,1,2,Normal2,5,6,10,7,10,8,2,3,Normal3,3,4,8,5,8,6,0,1,Normal4,2,4,7,1,9,9,5,6,Chaotic5,1,7,1,1,9,5,1,1,Chaotic6,8,8,8,6,7,9,3,2,Chaotic
+Country,Land_2015,Sea_2015,Land_2014,Sea_2014,Land_2013,Sea_2013,Land_2012,Sea_2012,Continent
+China,1929,286,2082,47,1939,71,1684,303,Asia
+Austria,2511,516,3077,636,2695,673,2524,1062,Europe
+Russia,2701,219,4625,221,3691,356,3284,667,Europe
+Sweden,2368,162,3181,142,3170,209,3154,275,Europe
+India,696,160,656,60,736,267,758,135,Asia
+Mexico,4605,211,5621,377,3697,241,2923,259,North America
+Canada,3863,1215,4684,685,4384,1461,4017,1172,North America
+Hungray,648,58,780,63,540,38,509,70,Europe
+South Korea,8718,18,8364,10,7527,40,7313,63,Asia
+Denmark,2476,184,2885,201,2955,118,3273,281,Europe
+Portugal,2011,549,2213,407,2028,606,1827,824,Europe
